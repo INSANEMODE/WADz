@@ -20,16 +20,16 @@ public class WadEntryArray {
     }
 
     public void print() {
-        Logger.debug("-----------Got Files-----------");
+        Logger.debug("----------- Files -----------");
         Logger.debug(ModernString.join(", ", entries.stream().map(WadEntry::getName).toArray()));
-        Logger.debug("-----------Got Files-----------");
+        Logger.debug("----------- Files -----------");
     }
 
     public static class WadEntry {
         private long offset = -1;
         private byte[] file = new byte[0];
         private long compressedLen;
-        private CompressEntry compressEntry;
+        private CompressedEntry compressEntry;
         private String name;
 
         public String getName() {
@@ -59,11 +59,11 @@ public class WadEntryArray {
 
         public void setPayload(byte[] buffer) {
             file = buffer;
-            compressEntry = new CompressEntry(buffer, false);
+            compressEntry = new CompressedEntry(buffer, false);
         }
 
         public void setCompressedPayload(byte[] buffer) {
-            compressEntry = new CompressEntry(buffer, true);
+            compressEntry = new CompressedEntry(buffer, true);
             file = compressEntry.decompress(file.length);
         }
 
@@ -79,43 +79,55 @@ public class WadEntryArray {
             return file;
         }
 
-        public CompressEntry getCompressEntry() {
+        public CompressedEntry getCompressEntry() {
             return compressEntry;
         }
 
-        public class CompressEntry {
+        public class CompressedEntry {
             private byte[] buffer;
 
-            public CompressEntry(byte[] entry, boolean compressed) {
-                if (!compressed) {
-                    Deflater deflater = new Deflater(Deflater.BEST_COMPRESSION);
-                    deflater.setInput(entry);
-                    deflater.finish();
-                    byte[] tempBuffer = new byte[Short.MAX_VALUE];
-                    int len = deflater.deflate(tempBuffer);
-                    buffer = new byte[len];
-                    System.arraycopy(tempBuffer, 0, buffer, 0, len);
-                } else {
+            private CompressedEntry(byte[] entry, boolean compressed) {
+                Deflater deflater;
+                byte[] tempBuffer;
+                int len;
+
+                if (compressed) {
                     buffer = entry;
+                    return;
                 }
+
+                deflater = new Deflater(Deflater.BEST_COMPRESSION);
+                deflater.setInput(entry);
+                deflater.finish();
+
+                tempBuffer = new byte[entry.length + 0xFF];
+                len = deflater.deflate(tempBuffer);
+
+                buffer = new byte[len];
+                System.arraycopy(tempBuffer, 0, buffer, 0, len);
             }
 
-            public byte[] decompress(long decompressedSize) {
-                byte[] ret = new byte[(int) decompressedSize];
-                Inflater decompresser = new Inflater();
-                decompresser.setInput(buffer, 0, buffer.length);
-               //Logger.debug(BitConverter.toString(buffer));
+            private byte[] decompress(long decompressedSize) {
+                Inflater decompresser;
                 int resultLength = -1;
+                byte[] ret;
+
+                ret = new byte[(int) decompressedSize];
+
+                decompresser = new Inflater();
+                decompresser.setInput(buffer, 0, buffer.length);
+
                 try {
                     resultLength = decompresser.inflate(ret);
                 } catch (DataFormatException e) {
-                    Logger.debug(DataUtils.getHex(buffer));
+                    Logger.debug("Couldn't decompress: %s", DataUtils.getHex(buffer));
                     e.printStackTrace();
                     return null;
                 }
-                if (resultLength == -1) {
+
+                if (resultLength == -1)
                     Logger.warn("Bad compressed size!");
-                }
+
                 decompresser.end();
                 return ret;
             }

@@ -53,11 +53,11 @@ public class Header {
     }
 
     public void print() {
-        Logger.debug("-----------Got Header-----------");
+        Logger.debug("----------- Header -----------");
         Logger.debug("Version  : " + ffotdVersion);
         Logger.debug("Time     : " + new SimpleDateFormat("dd/MM/yyyy - hh:mm:ss").format(new Date(timestamp)));
         Logger.debug("Entities : " + entries);
         Logger.debug("Magic    : " + BitConverter.toString(magic));
-        Logger.debug("-----------Got Header-----------");
+        Logger.debug("----------- Header -----------");
     }
 }

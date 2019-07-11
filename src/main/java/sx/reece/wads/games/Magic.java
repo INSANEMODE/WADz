@@ -1,6 +1,5 @@
-package sx.reece.wads;
+package sx.reece.wads.games;
 
-import sx.reece.wads.games.Game;
 import sx.reece.javakit.utils.DataUtils;
 
 import java.util.Arrays;

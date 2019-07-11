@@ -8,7 +8,7 @@ public class WadFile {
     private Header header = new Header();
     private WadEntryArray entries = new WadEntryArray();
 
-    public WadFile(Game game) {
+    protected WadFile(Game game) {
         this.game = game;
     }
 
@@ -16,7 +16,7 @@ public class WadFile {
         return header;
     }
 
-    public void setHeader(Header header) {
+    protected void setHeader(Header header) {
         this.header = header;
     }
 
@@ -28,7 +28,7 @@ public class WadFile {
         return entries;
     }
 
-    public void setEntries(WadEntryArray entries) {
+    protected void setEntries(WadEntryArray entries) {
         this.entries = entries;
     }
 

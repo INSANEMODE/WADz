@@ -6,7 +6,7 @@ import sx.reece.javakit.logger.Logger;
 import sx.reece.javakit.modern.ModernBuffer;
 import sx.reece.javakit.modern.ModernFile;
 import sx.reece.javakit.stream.ModernOutputStreamWriter;
-import sx.reece.wads.Magic;
+import sx.reece.wads.games.Magic;
 import sx.reece.wads.WadEntryArray;
 import sx.reece.wads.WadFile;
 import sx.reece.wads.Wadz;
@@ -23,7 +23,7 @@ public class Main {
 
         file         = ModernFile.getFileOrCreateNew(fileName);
         streamWriter = new ModernOutputStreamWriter(new FileOutputStream(file));
-        wad          = new WadFile(game);
+        wad          = Wadz.newWad(game);
 
         setEntriesFromDir(new File(dir), wad.getEntries());
         wad.getHeader().setFfotdVersion(0);
@@ -93,7 +93,7 @@ public class Main {
 
             file   = ModernFile.get(entryFile);
             buffer = file.readAllBytes();
-            
+
             entry = new WadEntryArray.WadEntry();
             entry.setName(file.getFileName());
             entry.setPayload(buffer);

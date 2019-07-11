@@ -2,7 +2,6 @@ package sx.reece.wads.games;
 
 import sx.reece.javakit.modern.ModernBuffer;
 import sx.reece.wads.Header;
-import sx.reece.wads.Magic;
 import sx.reece.wads.WadEntryArray;
 
 /**

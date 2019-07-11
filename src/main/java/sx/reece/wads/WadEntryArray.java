@@ -1,8 +1,9 @@
 package sx.reece.wads;
 
-import sx.reece.csharp.BitConverter;
-import sx.reece.logger.Logger;
-import sx.reece.modern.ModernString;
+
+import sx.reece.javakit.logger.Logger;
+import sx.reece.javakit.modern.ModernString;
+import sx.reece.javakit.utils.DataUtils;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -62,7 +63,6 @@ public class WadEntryArray {
         }
 
         public void setCompressedPayload(byte[] buffer) {
-            Logger.log("Set " + getName());
             compressEntry = new CompressEntry(buffer, true);
             file = compressEntry.decompress(file.length);
         }
@@ -109,7 +109,7 @@ public class WadEntryArray {
                 try {
                     resultLength = decompresser.inflate(ret);
                 } catch (DataFormatException e) {
-                    Logger.debug(BitConverter.toString(buffer));
+                    Logger.debug(DataUtils.getHex(buffer));
                     e.printStackTrace();
                     return null;
                 }

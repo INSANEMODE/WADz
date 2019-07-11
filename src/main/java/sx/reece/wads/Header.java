@@ -1,7 +1,8 @@
 package sx.reece.wads;
 
-import sx.reece.csharp.BitConverter;
-import sx.reece.logger.Logger;
+
+import sx.reece.javakit.csharp.BitConverter;
+import sx.reece.javakit.logger.Logger;
 
 import java.text.SimpleDateFormat;
 import java.util.Date;

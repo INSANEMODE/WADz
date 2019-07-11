@@ -1,12 +1,9 @@
-package sx.reece.games;
+package sx.reece.wads.games;
 
-import sx.reece.logger.Logger;
-import sx.reece.modern.ModernBuffer;
+import sx.reece.javakit.modern.ModernBuffer;
 import sx.reece.wads.Header;
+import sx.reece.wads.Magic;
 import sx.reece.wads.WadEntryArray;
-
-import java.util.concurrent.atomic.AtomicInteger;
-import java.util.concurrent.atomic.AtomicLong;
 
 /**
  * Created by RSX on 06/10/2016.
@@ -15,17 +12,6 @@ public class PCT5 extends Game {
     public PCT5() {
 
     }
-    public PCT5(String path) {
-        super(path);
-    }
-
-    public PCT5(byte[] buffer) {
-        super(buffer);
-    }
-
-    public PCT5(ModernBuffer buffer) {
-        super(buffer);
-    }
 
     @Override
     public String getName() {
@@ -33,18 +19,17 @@ public class PCT5 extends Game {
     }
 
     @Override
-    public Header readHeader() {
+    public Header readHeader(ModernBuffer mbuffer) {
         Header header = new Header();
         header.setMagic(mbuffer.readBytes(4));
-        header.setTimestamp((int)mbuffer.readUInt32LE().getValue());
+        header.setTimestamp((int)mbuffer.readUInt32BE().getValue());
         header.setEntries((int) mbuffer.readUInt32BE().getValue());
-        header.setFfotdVersion((int)mbuffer.readUInt32LE().getValue());
-        header.print();
+        header.setFfotdVersion((int)mbuffer.readUInt32BE().getValue());
         return header;
     }
 
     @Override
-    public WadEntryArray readEntryArray(Header header) {
+    public WadEntryArray readEntryArray(ModernBuffer mbuffer, Header header) {
         WadEntryArray array = new WadEntryArray();
         for (int i = 0; i < header.getEntries(); i++) {
             WadEntryArray.WadEntry entry = new WadEntryArray.WadEntry();
@@ -59,18 +44,17 @@ public class PCT5 extends Game {
 
             array.getEntries().add(entry);
         }
-        array.print();
         return array;
     }
 
     @Override
-    public WadEntryArray readFiles(WadEntryArray array) {
+    public WadEntryArray readFiles(ModernBuffer mbuffer,WadEntryArray array) {
         array.getEntries().forEach(item -> item.setCompressedPayload(mbuffer.readBytes((int) item.getCompressedLen())));
         return array;
     }
 
     @Override
-    public void writeEntries(WadEntryArray array) {
+    public void writeEntries(ModernBuffer mbuffer,WadEntryArray array) {
         int curOffset = ((4 * 4) + (array.getEntries().size() * 44));
         for (WadEntryArray.WadEntry item : array.getEntries()) {
             byte[] pad = new byte[32 - (item.getName().length() + 1)];
@@ -85,15 +69,20 @@ public class PCT5 extends Game {
     }
 
     @Override
-    public void writeHeader(Header header, WadEntryArray entries) {
+    public void writeHeader(ModernBuffer mbuffer,Header header, WadEntryArray entries) {
         mbuffer.writeBytes(header.getMagic());
-        mbuffer.writeUInt32LE(header.getTimestamp());
+        mbuffer.writeUInt32BE(header.getTimestamp());
         mbuffer.writeUInt32BE(entries.getEntries().size());
-        mbuffer.writeUInt32LE(header.getFfotdVersion());
+        mbuffer.writeUInt32BE(header.getFfotdVersion());
     }
 
     @Override
     public String[] aliases() {
         return new String[]{"steam_t5", "pct5", "54-33-77-AB"};
+    }
+
+    @Override
+    public Magic getMagic() {
+        return Magic.T5;
     }
 }

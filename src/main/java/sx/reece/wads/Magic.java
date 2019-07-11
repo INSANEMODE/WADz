@@ -1,8 +1,10 @@
 package sx.reece.wads;
 
-import sx.reece.csharp.BitConverter;
+import sx.reece.wads.games.Game;
+import sx.reece.javakit.utils.DataUtils;
 
 import java.util.Arrays;
+import java.util.Optional;
 
 /**
  * Created by RSX on 06/10/2016.
@@ -19,15 +21,15 @@ public enum Magic {
         return buf;
     }
 
-    public String toGame() {
-        return BitConverter.toString(buf); //eh... all games have their magic as an alias
+    public String toString() {
+        return DataUtils.getHex(buf);
     }
 
-    Magic getMagicByMagic(byte[] m) {
-        for (Magic magic : Magic.values()) {
-            if (Arrays.equals(magic.getBuf(), m))
-                return magic;
-        }
-        return null;
+    public Game toGame() {
+        return Game.getFromMagic(this).orElseThrow(() -> {return new RuntimeException("Game not implemented");});
+    }
+
+    public static Optional<Magic> getByMagic(byte[] m) {
+        return Arrays.stream(Magic.values()).filter((magic) -> Arrays.equals(magic.getBuf(), m)).findAny();
     }
 }

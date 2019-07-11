@@ -14,7 +14,10 @@ import java.util.stream.Stream;
  * Created by RSX on 06/10/2016.
  */
 public abstract class Game {
-    private static Game[] GAMES = {new PCT6(), new PCT5()};
+    public static final Game PCT6 = new PCT6();
+    public static final Game PCT5 = new PCT5();
+
+    private static Game[] GAMES = {PCT6, PCT5};
 
     Game() { }
 
@@ -25,6 +28,7 @@ public abstract class Game {
             return aliasMatch || nameMatch;
         }).findAny();
     }
+
     public static Optional<Game> getFromMagic(Magic magic) {
         return Arrays.stream(GAMES).filter((game) -> game.getMagic() == magic).findAny();
     }

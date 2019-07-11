@@ -23,4 +23,8 @@ public class Wadz {
         Game gwad = Game.getFromName(game).orElseThrow(() -> {return new RuntimeException("Invalid Game");});
         return new WadFile(gwad);
     }
+
+    public static WadFile newWad(Game game) {
+        return new WadFile(game);
+    }
 }

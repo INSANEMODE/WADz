@@ -1,4 +1,4 @@
-package sx.reece.bootstrap;
+package sx.reece.wads.cli;
 
 import sx.reece.wads.games.Game;
 import sx.reece.javakit.csharp.Console;
@@ -16,18 +16,18 @@ import java.io.FileOutputStream;
 import java.util.Arrays;
 
 public class Main {
-    private static void build(String fileName, String dir, Magic magic) throws Exception {
-        WadFile wad;
+    private static void build(String fileName, String dir, Game game) throws Exception {
         ModernOutputStreamWriter streamWriter;
+        WadFile wad;
         File file;
 
-        file = ModernFile.getFileOrCreateNew(fileName);
+        file         = ModernFile.getFileOrCreateNew(fileName);
         streamWriter = new ModernOutputStreamWriter(new FileOutputStream(file));
-        wad = new WadFile(magic.toGame());
+        wad          = new WadFile(game);
 
         setEntriesFromDir(new File(dir), wad.getEntries());
         wad.getHeader().setFfotdVersion(0);
-        wad.getHeader().setMagic(magic.getBuf());
+        wad.getHeader().setMagic(game.getMagic().getBuf());
 
         wad.write(streamWriter);
         streamWriter.flush();
@@ -35,10 +35,10 @@ public class Main {
 
     private static void unpack(String fileName, String dir) throws Exception {
         ModernBuffer wadFile;
-        WadFile wad;
-        Game game;
-        Magic magic;
         byte[] header;
+        WadFile wad;
+        Magic magic;
+        Game game;
 
         wadFile = ModernFile.get(fileName).getModernBuffer();
 
@@ -59,7 +59,7 @@ public class Main {
 
     public static void main(String[] args) throws Exception {
         boolean isBuilding;
-        Magic magic = null;
+        Game game = null;
         String dir;
         String fileName;
 
@@ -67,8 +67,8 @@ public class Main {
         isBuilding = Console.readLine().contains("y");
 
         if (isBuilding) {
-            Logger.log("Are we using %s or %s (y = first - t6/mw3)?", Magic.T6.toGame(), Magic.T5.toGame());
-            magic = Console.readLine().contains("y") ? Magic.T6 : Magic.T5;
+            Logger.log("Are we using %s or %s (y = first - t6/mw3)?", Game.PCT6.getName(), Game.PCT5.getName());
+            game = Console.readLine().contains("y") ? Game.PCT6 : Game.PCT5;
         }
 
         Logger.log("The %s directory:", !isBuilding ? "export" : "input");
@@ -80,18 +80,24 @@ public class Main {
         fileName = Console.readLine();
 
         if (isBuilding)
-            build(fileName, dir, magic);
+            build(fileName, dir, game);
         else
             unpack(fileName, dir);
     }
 
     private static void setEntriesFromDir(File dir, WadEntryArray array) {
         Arrays.stream(dir.listFiles()).forEach(entryFile ->{
-            ModernFile file = ModernFile.get(entryFile);
-            byte[] buffer = file.readAllBytes();
-            WadEntryArray.WadEntry entry = new WadEntryArray.WadEntry();
+            WadEntryArray.WadEntry entry;
+            ModernFile file;
+            byte[] buffer;
+
+            file   = ModernFile.get(entryFile);
+            buffer = file.readAllBytes();
+            
+            entry = new WadEntryArray.WadEntry();
             entry.setName(file.getFileName());
             entry.setPayload(buffer);
+
             array.getEntries().add(entry);
         });
     }
